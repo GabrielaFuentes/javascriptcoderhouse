@@ -1,74 +1,86 @@
-function getProduct(product) {
-    switch (product) {
-        case '1':
-            return 300;
-        case '2':
-            return 400;
-        case '3':
-            return 250;
-        case '4':
-            return 0;
-        default:
-            return null;
+class Product {
+    constructor(id, name, price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
     }
+}
+
+const products = [
+    new Product('1', 'Chicken Wings', 300),
+    new Product('2', 'Nuggets de Pollo', 400),
+    new Product('3', 'Sandwich de pollo', 250),
+];
+
+function getProductById(productId) {
+    return products.find(product => product.id === productId);
+}
+
+function printMenu() {
+    console.log('Menú de Productos:');
+    products.forEach(product => {
+        console.log(`${product.id}. ${product.name} - $${product.price}`);
+    });
 }
 
 function main() {
     alert('Bienvenidos a RFS Chicken');
+    const buyHistory = [];
 
-    let product = prompt(`Elige un producto: \n 1. Chicken Wings \n 2. Nuggets de Pollo \n 3. Sandwich de pollo \n 4. No tengo hambre aun`);
+    while (true) {
+        printMenu();
 
-    if (product == '1') {
-        console.log('Elegiste Chicken Wings')
-    } else if (product == '2') {
-        console.log('Eligiste Nuggets de Pollo')
-    } else if (product == '3') {
-        console.log('Eligiste Sandwich de pollo')
-    } else if (product == '4') {
-        alert('Vuelva cuanto tenga hambre')
-        return
-    } else {
-        alert('Opcion no valida')
-        return
-    }
+        let product = prompt(`Elige un producto: \n 1. Chicken Wings \n 2. Nuggets de Pollo \n 3. Sandwich de pollo \n 4. Terminar pedido`);
+        if (product === '4') {
+            break;
+        }
 
-    let friesChoice = prompt('¿Deseas papas fritas? (Sí o No)').toLowerCase();
-    let price = getProduct(product);
+        const selectedProduct = getProductById(product);
 
-    if (price === null) {
-        alert('Opción no válida');
-        return;
-    }
+        if (!selectedProduct) {
+            alert('Opción no válida');
+            continue;
+        }
 
-    if (friesChoice === 'sí' || friesChoice === 'si') {
-        price += 120;
-    }else if (friesChoice !== 'no') {
-        alert('Opcion no valida')
-        return
-    }
+        console.log(`Elegiste ${selectedProduct.name}`);
 
-    alert(`El precio total es: $${price}`);
+        let friesChoice = prompt('¿Deseas papas fritas? (Sí o No)').toLowerCase();
+        let hasFries = friesChoice === 'sí' || friesChoice === 'si';
 
-    payment = prompt('Con ¿qué monto deseas pagar?');
+        if (hasFries) {
+            selectedProduct.price += 120;
+        } else if (friesChoice !== 'no') {
+            alert('Opción no válida');
+            continue;
+        }
 
-    while (isNaN(payment) || payment < price) {
-        payment = prompt('Con ¿qué monto deseas pagar?');
+        alert(`El precio total es: $${selectedProduct.price}`);
+
+        let payment = prompt('Con ¿qué monto deseas pagar?');
         payment = parseFloat(payment);
 
-        if (isNaN(payment)) {
-            alert('Ingresa un monto válido');
-        } else if (payment < price) {
-            alert('El monto es insuficiente, ingrese un monto mayor o igual al precio.');
+        while (isNaN(payment) || payment < selectedProduct.price) {
+            alert(isNaN(payment) ? 'Ingresa un monto válido' : 'El monto es insuficiente, ingresa un monto mayor o igual al precio.');
+            payment = parseFloat(prompt('Con ¿qué monto deseas pagar?'));
         }
+
+        let change = payment - selectedProduct.price;
+        alert(`Su cambio es de: ${change}`);
+
+        buyHistory.push({
+            product: selectedProduct.name,
+            price: selectedProduct.price,
+            hasFries: hasFries,
+        });
     }
 
-    let change = payment - price;
-    alert('Su cambio es de: $' + change);
+    console.log('Historial de Compras:');
+    buyHistory.forEach((buy, index) => {
+        const frieText = buy.hasFries ? 'con papas fritas' : 'sin papas fritas';
+        console.log(`Compra ${index + 1}: ${buy.product} ${frieText} - $${buy.price} `);
+    });
 
     alert('Gracias por tu visita. ¡Hasta luego!');
-
-
-
 }
 
 main();
